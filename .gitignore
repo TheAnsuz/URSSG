@@ -1,0 +1,15 @@
+# Eclipse
+/bin/
+/tmp/
+/.settings/
+.classpath
+.project
+
+# Maven
+/target/
+
+# NetBeans
+/nbproject/
+/build/
+build.xml
+manifest.mf
