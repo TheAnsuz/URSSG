@@ -14,7 +14,7 @@
 build.xml
 manifest.mf
 
-# InteliJ
+# IntelliJ
 /.idea/
 /out/
 *.iml
