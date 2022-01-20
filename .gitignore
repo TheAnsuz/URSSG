@@ -13,3 +13,10 @@
 /build/
 build.xml
 manifest.mf
+
+# InteliJ
+/.idea/
+/out/
+*.iml
+*.iws
+*.ipr
