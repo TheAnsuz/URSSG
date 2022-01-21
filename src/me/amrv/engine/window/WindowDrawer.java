@@ -8,7 +8,10 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import me.amrv.engine.Drawer;
 
@@ -17,7 +20,8 @@ public class WindowDrawer {
 	private final Canvas canvas;
 	private Rectangle bounds;
 	private BufferStrategy buffer;
-	protected final List<Drawer> drawers = new ArrayList<>();
+	protected final Map<Integer, List<Drawer>> drawers = new TreeMap<>();
+	protected int zIndex = 0;
 	private final RenderingHints hints;
 
 	protected WindowDrawer(Canvas canvas) {
@@ -26,7 +30,8 @@ public class WindowDrawer {
 		this.canvas.setBackground(Color.BLACK);
 		this.canvas.createBufferStrategy(2);
 		this.buffer = this.canvas.getBufferStrategy();
-		this.hints = new RenderingHints(RenderingHints.KEY_ALPHA_INTERPOLATION,RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT);
+		this.hints = new RenderingHints(RenderingHints.KEY_ALPHA_INTERPOLATION,
+				RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT);
 	}
 
 	public synchronized void setVsync(boolean vsync) {
@@ -40,9 +45,8 @@ public class WindowDrawer {
 	}
 
 	public void setHighQualityInterpolation(boolean value) {
-		hints.put(RenderingHints.KEY_ALPHA_INTERPOLATION,
-				(value) ? RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY
-						: RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+		hints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, (value) ? RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY
+				: RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
 	}
 
 	public void setHighQualityRending(boolean value) {
@@ -62,8 +66,7 @@ public class WindowDrawer {
 
 	public enum Interpolation {
 		NEAREST(RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR),
-		BICUBIC(RenderingHints.VALUE_INTERPOLATION_BICUBIC), 
-		BILINEAR(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		BICUBIC(RenderingHints.VALUE_INTERPOLATION_BICUBIC), BILINEAR(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
 		private Object value;
 
@@ -97,47 +100,70 @@ public class WindowDrawer {
 //	public void setResolutionType(ResolutionType value) {
 //		getGraphics2D().setRenderingHint(RenderingHints.KEY_RESOLUTION_VARIANT, value.value);
 //	}
-	
+
 	public void setHighQualityBounding(boolean value) {
 		hints.put(RenderingHints.KEY_STROKE_CONTROL,
 				(value) ? RenderingHints.VALUE_STROKE_NORMALIZE : RenderingHints.VALUE_STROKE_PURE);
 	}
-	
-	
+
 	public void setTextAntialising(boolean value) {
-		hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, (value) ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		hints.put(RenderingHints.KEY_TEXT_ANTIALIASING,
+				(value) ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 	}
-	
+
 	public enum Contrast {
-		GASP(RenderingHints.VALUE_TEXT_ANTIALIAS_GASP),
-		HBGR(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR),
-		HRGB(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB),
-		VBGR(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR),
+		GASP(RenderingHints.VALUE_TEXT_ANTIALIAS_GASP), HBGR(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR),
+		HRGB(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB), VBGR(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR),
 		VRGB(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
-		
+
 		private Object value;
-		
+
 		private Contrast(Object value) {
 			this.value = value;
 		}
 	}
-	
+
 	public void setLCDContrast(Contrast value) {
 		hints.put(RenderingHints.KEY_TEXT_LCD_CONTRAST, value.value);
 	}
 
 	protected void addDrawer(Drawer drawer) {
+		addDrawer(drawer, zIndex, false);
+	}
+
+	protected void addDrawer(Drawer drawer, int index) {
+		addDrawer(drawer, index, false);
+	}
+
+	protected void addDrawer(Drawer drawer, int index, boolean overlap) {
 		if (drawer == null)
 			return;
-		if (drawers.isEmpty() || !drawers.contains(drawer))
-			drawers.add(drawer);
+
+		final Integer val = Integer.valueOf(index);
+		if (drawers.containsKey(val)) {
+			if (overlap)
+				drawers.get(val).add(0, drawer);
+			else
+				drawers.get(val).add(drawer);
+		} else {
+			if (index > zIndex)
+				zIndex = index;
+			drawers.put(val, new ArrayList<Drawer>(Arrays.asList(drawer)));
+		}
+	}
+
+	protected void removeLayer(int layer) {
+		if (drawers.containsKey(Integer.valueOf(layer)))
+			drawers.remove(Integer.valueOf(layer));
 	}
 
 	protected void removeDrawer(Drawer drawer) {
 		if (drawer == null)
 			return;
-		if (!drawers.isEmpty() && drawers.contains(drawer))
-			drawers.remove(drawer);
+		drawers.forEach((i, value) -> {
+			if (!value.isEmpty() || value.contains(drawer))
+				value.remove(drawer);
+		});
 	}
 
 	protected void removeDrawers() {

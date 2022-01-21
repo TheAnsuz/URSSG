@@ -14,7 +14,7 @@ public class WindowTesting {
 			Window w = new Window("Ventana");
 			w.getDrawer().setAntialiasing(true);
 			w.getDrawer().setHighQualityRending(true);
-			w.addDrawer(new DrawTesting());
+			w.addDrawer(new DrawTesting(),0);
 			String command = "";
 			while (!w.shouldClose()) {
 

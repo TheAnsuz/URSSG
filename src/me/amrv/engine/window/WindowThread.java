@@ -1,5 +1,7 @@
 package me.amrv.engine.window;
 
+import java.util.List;
+
 import me.amrv.engine.Drawer;
 
 public class WindowThread implements Runnable {
@@ -51,8 +53,12 @@ public class WindowThread implements Runnable {
 				continue;
 			final int width = drawer.getBounding().width;
 			final int height = drawer.getBounding().height;
-			for (Drawer d : drawer.drawers)
-				d.render(new WindowRender(drawer.getGraphics2D()), width, height);
+			
+			for (List<Drawer> list : drawer.drawers.values())
+				list.forEach(drawer->{
+					drawer.render(new WindowRender(this.drawer.getGraphics2D()), width, height);
+				});
+
 			
 			drawer.updateGraphics();
 			try {

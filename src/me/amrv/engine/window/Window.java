@@ -47,8 +47,24 @@ public class Window {
 		this.drawer.addDrawer(drawer);
 	}
 	
+	public void addDrawer(Drawer drawer, int index) {
+		this.drawer.addDrawer(drawer, index);
+	}
+	
+	public void addDrawer(Drawer drawer, int index, boolean overlap) {
+		this.drawer.addDrawer(drawer, index, overlap);
+	}
+	
 	public void removeDrawer(Drawer drawer) {
 		this.drawer.removeDrawer(drawer);
+	}
+	
+	public void removeDrawerLayer(int layer) {
+		this.drawer.removeLayer(layer);
+	}
+	
+	public void removeDrawers() {
+		this.drawer.removeDrawers();
 	}
 	
 	public boolean isFullScreen() {
