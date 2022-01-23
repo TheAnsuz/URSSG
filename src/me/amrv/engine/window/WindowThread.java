@@ -10,20 +10,20 @@ public class WindowThread implements Runnable {
 	private final Thread thread;
 	private int renderLatency = 16;
 	private boolean paused;
-	
+
 	protected WindowThread(WindowDrawer drawer) {
 		this.drawer = drawer;
 		this.thread = new Thread(this);
 	}
-	
+
 	protected void setLatency(int latency) {
 		this.renderLatency = latency;
 	}
-	
+
 	public int getLatency() {
 		return this.renderLatency;
 	}
-	
+
 	protected void start() {
 		thread.start();
 	}
@@ -31,11 +31,11 @@ public class WindowThread implements Runnable {
 	protected void pause(boolean pause) {
 		this.paused = pause;
 	}
-	
+
 	public boolean isPaused() {
 		return this.paused;
 	}
-	
+
 	protected void stop() {
 		try {
 			thread.join();
@@ -44,23 +44,30 @@ public class WindowThread implements Runnable {
 		}
 
 	}
-	
+
 	@Override
 	public void run() {
 
+		int executions = 0;
+		long t = System.currentTimeMillis();
 		while (true) {
 			if (paused)
 				continue;
 			final int width = drawer.getBounding().width;
 			final int height = drawer.getBounding().height;
-			
+
 			for (List<Drawer> list : drawer.drawers.values())
-				list.forEach(drawer->{
+				list.forEach(drawer -> {
 					drawer.render(new WindowRender(this.drawer.getGraphics2D()), width, height);
 				});
 
-			
 			drawer.updateGraphics();
+			if (System.currentTimeMillis() - t > 1000) {
+				System.out.println("FPS[" + executions + " - " + t + "]");
+				t = System.currentTimeMillis();
+				executions = 0;
+			} else
+				executions++;
 			try {
 				Thread.sleep(renderLatency);
 			} catch (InterruptedException e) {
