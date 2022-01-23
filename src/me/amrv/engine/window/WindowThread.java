@@ -44,23 +44,30 @@ public class WindowThread implements Runnable {
 		}
 
 	}
-	
+
 	@Override
 	public void run() {
 
+		int executions = 0;
+		long t = System.currentTimeMillis();
 		while (true) {
 			if (paused)
 				continue;
 			final int width = drawer.getBounding().width;
 			final int height = drawer.getBounding().height;
-			
+
 			for (List<Drawer> list : drawer.drawers.values())
-				list.forEach(drawer->{
+				list.forEach(drawer -> {
 					drawer.render(new WindowRender(this.drawer.getGraphics2D()), width, height);
 				});
 
-			
 			drawer.updateGraphics();
+			if (System.currentTimeMillis() - t > 1000) {
+				System.out.println("FPS[" + executions + " - " + t + "]");
+				t = System.currentTimeMillis();
+				executions = 0;
+			} else
+				executions++;
 			try {
 				Thread.sleep(renderLatency);
 			} catch (InterruptedException e) {

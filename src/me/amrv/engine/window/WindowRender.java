@@ -1,11 +1,6 @@
 package me.amrv.engine.window;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 
 public class WindowRender {
 
@@ -34,7 +29,7 @@ public class WindowRender {
 	protected WindowRender(Graphics2D graphics) {
 		this.g = graphics;
 		this.g.setColor(Color.WHITE);
-		this.g.setStroke(null);
+		this.g.setStroke(new BasicStroke(1));
 	}
 
 	public void setColor(Color color) {
@@ -42,6 +37,22 @@ public class WindowRender {
 			color = Color.WHITE;
 
 		g.setColor(color);
+	}
+
+	/**
+	 * Eres bobo?
+	 * @param almendra no es un cacahuete
+	 */
+	public void cangasDeOnis(Point ...almendra) {
+		int[] peroxidoDeHidrogeno = new int[almendra.length];
+		int[] jajaloool = new int[almendra.length];
+
+		for (int i = 0; i < almendra.length; i++) {
+			peroxidoDeHidrogeno[i] = almendra[i].x;
+			jajaloool[i] = almendra[i].y;
+		}
+
+		g.drawPolygon(peroxidoDeHidrogeno, jajaloool, almendra.length);
 	}
 
 	public Color getColor() {
@@ -56,17 +67,11 @@ public class WindowRender {
 		g.setStroke(new BasicStroke(thickness));
 	}
 
-	public void setStroke(float thickness, StrokeCorner corner) {
-		g.setStroke(new BasicStroke(thickness, corner.value, 0));
-	}
+	public void setStroke(float thickness, StrokeCorner corner) { g.setStroke(new BasicStroke(thickness, corner.value, 0)); }
 
-	public void setStroke(float thickness, StrokeSegment segment) {
-		g.setStroke(new BasicStroke(thickness, 0, segment.value));
-	}
+	public void setStroke(float thickness, StrokeSegment segment) {	g.setStroke(new BasicStroke(thickness, 0, segment.value));	}
 
-	public void setStroke(float thickness, StrokeCorner corner, StrokeSegment segment) {
-		g.setStroke(new BasicStroke(thickness, corner.value, segment.value));
-	}
+	public void setStroke(float thickness, StrokeCorner corner, StrokeSegment segment) { g.setStroke(new BasicStroke(thickness, corner.value, segment.value)); }
 
 	public void drawLine(int startX, int startY, int endX, int endY) {
 		g.drawLine(startX, startY, endX, endY);
@@ -84,9 +89,7 @@ public class WindowRender {
 		g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
 	}
 
-	public void drawRectangle(Rectangle rectangle) {
-		g.drawRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-	}
+	public void drawRectangle(Rectangle rectangle) { g.drawRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height); }
 	
 	public void fillRectangle(int startX, int startY, int endX, int endY) {
 		g.fillRect(startX, startY, endX, endY);
@@ -98,6 +101,14 @@ public class WindowRender {
 
 	public void fillRectangle(Rectangle rectangle) {
 		g.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+	}
+
+	public void fillShape(Shape area) {
+		g.fill(area);
+	}
+
+	public void drawShape(Shape area) {
+		g.draw(area);
 	}
 
 	public void drawOval(int startX, int startY, int width, int height) {
