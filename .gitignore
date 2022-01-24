@@ -1,3 +1,26 @@
+# Eclipse
+/bin/
+/tmp/
+/.settings/
+.classpath
+.project
+
+# Maven
+/target/
+
+# NetBeans
+/nbproject/
+/build/
+build.xml
+manifest.mf
+
+# IntelliJ
+/.idea/
+/out/
+*.iml
+*.iws
+*.ipr
+
 # Compiled class file
 *.class
 
