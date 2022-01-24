@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class GameObject {
     private final AtomicInteger x;
     private final AtomicInteger y;
+    private int speed;
     private final AtomicInteger width;
     private final AtomicInteger height;
     private final LayerDraw layer;
@@ -38,6 +39,14 @@ public abstract class GameObject {
     public void setY(int y) {
         this.y.set(y);
     }
+
+    public void addY(int y) {
+        this.y.addAndGet(y);
+    }
+
+    public int getSpeed() { return speed; }
+
+    public void setSpeed(int speed) { this.speed = speed; }
 
     public int getWidth() {
         return width.get();

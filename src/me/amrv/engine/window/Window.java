@@ -47,10 +47,6 @@ public class Window {
 
     }
 
-    public void addInput(Player player) {
-        screen.addKeyListener(new InputManager(player));
-    }
-
     public void addDrawer(Drawer drawer) {
         this.drawer.addDrawer(drawer);
     }

@@ -4,6 +4,8 @@ import me.amrv.engine.entity.Player;
 import me.amrv.engine.input.InputManager;
 import me.amrv.engine.window.Window;
 
+import java.awt.event.KeyEvent;
+
 public class GameState {
     public enum State {
         MAIN_MENU, GAME, MENU
@@ -19,11 +21,11 @@ public class GameState {
         this.window = window;
         this.state = state;
 
-        player = new Player(100, 100, 80, 180, playerLayer);
-        UpdateThread thread1 = new UpdateThread();
+        player = new Player(100, 100, 8,80, 180, playerLayer);
+        UpdateThread thread1 = new UpdateThread(60);
         thread1.start();
 
-        thread1.addObjectToUpdatePool(player);
+        thread1.addToUpdatePool(player);
 
         startDrawer();
         addInputManager();
@@ -35,6 +37,12 @@ public class GameState {
     }
 
     private void addInputManager() {
-        window.addInputManager(new InputManager(player));
+        InputManager inputManager = new InputManager();
+        inputManager.addLeftKeybind(KeyEvent.VK_A);
+        inputManager.addRightKeybind(KeyEvent.VK_D);
+        inputManager.addUpKeybind(KeyEvent.VK_W);
+        inputManager.addDownKeybind(KeyEvent.VK_S);
+        window.addInputManager(inputManager);
+        player.setInputManager(inputManager);
     }
 }
