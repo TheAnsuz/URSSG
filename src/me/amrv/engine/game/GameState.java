@@ -4,8 +4,6 @@ import me.amrv.engine.entity.Player;
 import me.amrv.engine.input.InputManager;
 import me.amrv.engine.window.Window;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class GameState {
     public enum State {
         MAIN_MENU, GAME, MENU
@@ -22,6 +20,11 @@ public class GameState {
         this.state = state;
 
         player = new Player(100, 100, 80, 180, playerLayer);
+        UpdateThread thread1 = new UpdateThread();
+        thread1.start();
+
+        thread1.addObjectToUpdatePool(player);
+
         startDrawer();
         addInputManager();
     }
