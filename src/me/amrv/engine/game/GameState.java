@@ -4,8 +4,6 @@ import me.amrv.engine.entity.Player;
 import me.amrv.engine.input.InputManager;
 import me.amrv.engine.window.Window;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class GameState {
     public enum State {
         MAIN_MENU, GAME, MENU

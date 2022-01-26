@@ -8,7 +8,7 @@ public class GameStateTesting {
         Window window = new Window("Test");
 
         window.getDrawer().setAntialiasing(true);
-        window.getDrawer().setHighQualityRending(true);
+//        window.getDrawer().setHighQualityRending(true);
         GameState mainState = new GameState(window, GameState.State.GAME);
     }
 }

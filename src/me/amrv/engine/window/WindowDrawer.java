@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,15 +19,22 @@ import me.amrv.engine.Drawer;
 public class WindowDrawer {
 
 	private final Canvas canvas;
-	private Rectangle bounds;
 	private BufferStrategy buffer;
 	protected final Map<Integer, List<Drawer>> drawers = new TreeMap<>();
 	protected int zIndex = 0;
+
+	// Graphics option
+	private boolean directPainting = false;
+	private Rectangle bounds;
+	private int imageType = BufferedImage.TYPE_4BYTE_ABGR;
 	private final RenderingHints hints;
+	
+	// Disposable rendered image
+	private BufferedImage rootImage;
 
 	protected WindowDrawer(Canvas canvas) {
 		this.canvas = canvas;
-		this.bounds = this.canvas.getBounds();
+		this.bounds = canvas.getBounds();
 		this.canvas.setBackground(Color.BLACK);
 		this.canvas.createBufferStrategy(2);
 		this.buffer = this.canvas.getBufferStrategy();
@@ -49,7 +57,7 @@ public class WindowDrawer {
 				: RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
 	}
 
-	public void setHighQualityRending(boolean value) {
+	public void setHighQualityColoring(boolean value) {
 		hints.put(RenderingHints.KEY_COLOR_RENDERING,
 				(value) ? RenderingHints.VALUE_COLOR_RENDER_QUALITY : RenderingHints.VALUE_COLOR_RENDER_SPEED);
 	}
@@ -84,22 +92,9 @@ public class WindowDrawer {
 				(value) ? RenderingHints.VALUE_RENDER_QUALITY : RenderingHints.VALUE_RENDER_SPEED);
 	}
 
-	// Only works for Java 9...
-//	public enum ResolutionType {
-//		BASE(RenderingHints.VALUE_RESOLUTION_VARIANT_BASE),
-//		DPI(RenderingHints.VALUE_RESOLUTION_VARIANT_DPI_FIT), 
-//		DPI_EXTRA(RenderingHints.VALUE_RESOLUTION_VARIANT_SIZE_FIT);
-//
-//		private Object value;
-//
-//		ResolutionType(Object value) {
-//			this.value = value;
-//		}
-//	}
-//	
-//	public void setResolutionType(ResolutionType value) {
-//		getGraphics2D().setRenderingHint(RenderingHints.KEY_RESOLUTION_VARIANT, value.value);
-//	}
+	public void setDirectPainting(boolean directPainting) {
+		this.directPainting = directPainting;
+	}
 
 	public void setHighQualityBounding(boolean value) {
 		hints.put(RenderingHints.KEY_STROKE_CONTROL,
@@ -175,12 +170,22 @@ public class WindowDrawer {
 	}
 
 	protected Graphics2D getGraphics2D() {
-		Graphics2D g = (Graphics2D) buffer.getDrawGraphics();
+		if (directPainting) {
+			Graphics2D g = (Graphics2D) buffer.getDrawGraphics();
+			g.setRenderingHints(hints);
+			return g;
+		}
+		rootImage = new BufferedImage(bounds.width, bounds.height, imageType);
+		final Graphics2D g = rootImage.createGraphics();
 		g.setRenderingHints(hints);
 		return g;
+
 	}
 
 	protected void updateGraphics() {
+		if (!directPainting) {
+			buffer.getDrawGraphics().drawImage(rootImage, 0, 0, canvas.getWidth(), canvas.getHeight(), canvas);
+		}
 		buffer.show();
 	}
 

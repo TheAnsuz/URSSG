@@ -14,7 +14,7 @@
 build.xml
 manifest.mf
 
-# IntelliJ macarena uwu
+# IntelliJ
 /.idea/
 /out/
 *.iml
