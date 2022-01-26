@@ -7,6 +7,7 @@
 
 ### Miembros del proyecto
 Adrián Martín
+
 Isamel Magro
 
 ### De que trata el juego
