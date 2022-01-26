@@ -11,11 +11,11 @@ public class GameState {
         MAIN_MENU, GAME, MENU
     }
 
-    Window window;
-    State state;
-    LayerDraw playerLayer = new LayerDraw();
+    private final Window window;
+    private State state;
+    private final LayerDraw playerLayer = new LayerDraw();
 
-    public Player player;
+    private final Player player;
 
     public GameState(Window window, State state) {
         this.window = window;
@@ -23,9 +23,9 @@ public class GameState {
 
         player = new Player(100, 100, 8,80, 180, playerLayer);
         UpdateThread thread1 = new UpdateThread(60);
-        thread1.start();
 
-        thread1.addToUpdatePool(player);
+        thread1.start();
+        thread1.addToPool(player);
 
         startDrawer();
         addInputManager();
@@ -33,7 +33,7 @@ public class GameState {
 
     private void startDrawer() {
         window.addDrawer(playerLayer, 0);
-        playerLayer.addObject(player);
+        playerLayer.add(player);
     }
 
     private void addInputManager() {

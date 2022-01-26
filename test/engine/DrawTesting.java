@@ -12,7 +12,8 @@ public class DrawTesting implements Drawer {
     public void render(WindowRender render, int width, int height) {
 
 
-        /*Random rand = new Random();
+        /*
+        Random rand = new Random();
 
         for (int y = 10; y < 600; y += 25) {
             int a = rand.nextInt(800);
@@ -58,7 +59,8 @@ public class DrawTesting implements Drawer {
 
                 render.cangasDeOnis(new Point(x, 4), new Point(180 + (y / x), 40), new Point(320, 10 + a));
             }
-        }*/
+        }
+        */
 
         Area a = new Area();
 

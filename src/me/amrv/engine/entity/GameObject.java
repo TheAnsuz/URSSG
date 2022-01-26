@@ -12,7 +12,7 @@ public abstract class GameObject {
     private final AtomicInteger height;
     private final LayerDraw layer;
 
-    public GameObject(int x, int y, int width, int height, LayerDraw layer) {
+    protected GameObject(int x, int y, int width, int height, LayerDraw layer) {
         this.x = new AtomicInteger(x);
         this.y = new AtomicInteger(y);
         this.width = new AtomicInteger(width);
