@@ -1,5 +1,6 @@
 package me.amrv.engine.game;
 
+import me.amrv.engine.entity.GameObject;
 import me.amrv.engine.entity.Player;
 import me.amrv.engine.input.InputManager;
 import me.amrv.engine.window.Window;
@@ -21,7 +22,7 @@ public class GameState {
         this.window = window;
         this.state = state;
 
-        player = new Player(100, 100, 8,80, 180, playerLayer);
+        player = new Player(100, 100, 8, 80, 180, playerLayer);
         UpdateThread thread1 = new UpdateThread(60);
 
         thread1.start();

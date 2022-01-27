@@ -1,12 +1,17 @@
 package me.amrv.engine.util;
 
 public class Vector {
-    private float x;
-    private float y;
+    public float x;
+    public float y;
 
     public Vector(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vector() {
+        this.x = 0;
+        this.y = 0;
     }
 
     public Vector(Vector vector) {
@@ -71,11 +76,6 @@ public class Vector {
 
     public void setY(float y) {
         this.y = y;
-    }
-
-    public static void main(String[] args) {
-        Vector a = new Vector(2, 3).add(new Vector(5, 6)).subtract(new Vector(2, 3));
-        System.err.println(a);
     }
 
     @Override

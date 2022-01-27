@@ -2,15 +2,29 @@ package me.amrv.engine.entity;
 
 import me.amrv.engine.game.LayerDraw;
 
+import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class GameObject {
+public class GameObject {
     private final AtomicInteger x;
     private final AtomicInteger y;
     private int speed;
     private final AtomicInteger width;
     private final AtomicInteger height;
     private final LayerDraw layer;
+    private Color color = Color.white;
+
+    public GameObject() {
+        this(0, 0, 0, 0);
+    }
+
+    protected GameObject(GameObject object) {
+        this(object.getX(), object.getY(), object.getWidth(), object.getHeight());
+    }
+
+    public GameObject(int x, int y, int width, int height) {
+        this(x, y, width, height, null);
+    }
 
     protected GameObject(int x, int y, int width, int height, LayerDraw layer) {
         this.x = new AtomicInteger(x);
@@ -19,6 +33,7 @@ public abstract class GameObject {
         this.height = new AtomicInteger(height);
         this.layer = layer;
     }
+
 
     public int getX() {
         return x.get();
@@ -44,9 +59,18 @@ public abstract class GameObject {
         this.y.addAndGet(y);
     }
 
-    public int getSpeed() { return speed; }
+    public void setPos(int x, int y) {
+        this.x.set(x);
+        this.y.set(y);
+    }
 
-    public void setSpeed(int speed) { this.speed = speed; }
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
 
     public int getWidth() {
         return width.get();
@@ -62,5 +86,13 @@ public abstract class GameObject {
 
     public void setHeight(int height) {
         this.height.set(height);
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }
