@@ -1,4 +1,4 @@
-package me.amrv.retrogine.console;
+package me.amrv.oldretrogine.console;
 
 import java.io.IOException;
 import java.io.InputStream;

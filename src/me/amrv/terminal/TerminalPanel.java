@@ -8,29 +8,31 @@ import javax.swing.JComponent;
 // El tamaño debe de poder cambiarse en pixeles y caracteres
 // 
 
-public class TerminalConsole extends JComponent {
+public class TerminalPanel extends JComponent {
 
 	private static final long serialVersionUID = -3836678159417978463L;
 	private static final char WIDTH_MODEL = '#';
 
-	public TerminalConsole() {
+	public TerminalPanel() {
 		this(new Font(Font.DIALOG_INPUT, Font.PLAIN, 14), 121, 36);
 	}
 
-	public TerminalConsole(Font font) {
+	public TerminalPanel(Font font) {
 		this(font, 121, 36);
 	}
 
-	public TerminalConsole(int columns, int lines) {
+	public TerminalPanel(int columns, int lines) {
 		this(new Font(Font.DIALOG_INPUT, Font.PLAIN, 14), columns, lines);
 	}
 
-	public TerminalConsole(Font font, int columns, int lines) {
+	public TerminalPanel(Font font, int columns, int lines) {
 		if (font == null)
-			throw new NullPointerException("You should not specify a null font");
+			throw new NullPointerException("Font canot be null");
 
 		super.setFocusable(true); // Allows key events to be launched
 		super.setFont(font);
+		this.setSizeInChars(columns, lines);
+		this.setPreferredSize(this.getSize());
 	}
 
 	public FontMetrics getFontMetrics() {
