@@ -1,63 +1,61 @@
 package me.amrv.engine.entity;
 
-import me.amrv.engine.game.LayerDraw;
+import me.amrv.engine.game.GameState;
 import me.amrv.engine.game.Update;
 import me.amrv.engine.input.InputManager;
-import me.amrv.engine.physics.Collider;
+import me.amrv.engine.collision.Collidable;
+import me.amrv.engine.collision.Collider;
 
-import java.awt.*;
-import java.awt.geom.Area;
+public class Player extends PhysicsObject implements Update, Collidable {
+    private final Collider objCollider = new Collider(x - 1, y - 1, width + 2, height + 2, this);
+    public GameState state;
 
-public class Player extends GameObject implements Update {
+    public Player(int x, int y, int speed, int width, int height) {
+        super(x, y, width, height, speed);
+        Collider sceneCollider = new Collider(this);
+        sceneCollider.setLayer(Collider.Layer.PLAYER);
+        setCollider(sceneCollider);
+        setObjCollisionDetector(objCollider);
+        objCollider.setActive(false);
+    }
 
-    private final Collider collider = new Collider(this);
-
-    public Player(int x, int y, int speed, int width, int height, LayerDraw layer) {
-        super(x, y, width, height, layer);
-        super.setSpeed(speed);
-        super.setColor(Color.GREEN);
+    public void setState(GameState state) {
+        this.state = state;
     }
 
     private InputManager inputManager;
 
+    private boolean canJump = true;
 
     @Override
     public void update() {
+        //TODO:: THIS IS A TEST FOR MOVING GAMEOBJECTS AND THEIR COLLISIONS
+        state.moveColliderTest.translate(1, 0);
+
         if (inputManager != null) {
             int horizontalInput = !inputManager.isRightPressed() ? (!inputManager.isLeftPressed() ? 0 : -1) : 1;
-            moveHorizontal(horizontalInput);
+            if (horizontalInput != 0) moveHorizontal(horizontalInput);
 
-            int verticalInput = !inputManager.isDownPressed() ? (!inputManager.isUpPressed() ? 0 : -1) : 1;
-            moveVertical(verticalInput);
+            if (inputManager.isUpPressed()) {
+                // Removes the ability to keep jump button pressed and jump constantly
+                if (canJump)
+                    jump();
+                canJump = false;
 
-//            if (inputManager.isLeftPressed()) addX(-1 * getSpeed());
-//            if (inputManager.isRightPressed()) addX(getSpeed());
-//            if (inputManager.isUpPressed()) addY(-1 * getSpeed());
-//            if (inputManager.isDownPressed()) addY(getSpeed());
-
-            //collider.setPos(getX() + horizontalInput, getY());
+                longJump();
+            } else canJump = true;
         }
+
+        objCollider.checkForOnCollision();
+        applyGravity();
     }
 
-    private void moveHorizontal(int horizontalInput) {
-        collider.translate(horizontalInput * getSpeed(), 0);
+    @Override
+    public void onCollide(Collider col) {
 
-        if (collider.isColliding()) {
-            for (int i = 0; collider.isColliding(); i += horizontalInput)
-                collider.translate(-horizontalInput, 0);
-        }
-        setPos(collider.x, collider.y);
+        System.out.println("Collision with: " + col);
     }
 
-    private void moveVertical(int verticalInput) {
-        collider.translate(0, verticalInput * getSpeed());
-
-        if (collider.isColliding()) {
-            for (int i = 0; collider.isColliding(); i += verticalInput)
-                collider.translate(0, -verticalInput);
-        }
-        setPos(collider.x, collider.y);
-    }
 
     public InputManager getInputManager() {
         return inputManager;
@@ -65,14 +63,5 @@ public class Player extends GameObject implements Update {
 
     public void setInputManager(InputManager inputManager) {
         this.inputManager = inputManager;
-    }
-
-    public Collider getCollider() {
-        return collider;
-    }
-
-    @Override
-    public String toString() {
-        return "Player: x " + getX() + ", y " + getY();
     }
 }

@@ -1,98 +1,21 @@
 package me.amrv.engine.entity;
 
-import me.amrv.engine.game.LayerDraw;
+import java.awt.Rectangle;
 
-import java.awt.*;
-import java.util.concurrent.atomic.AtomicInteger;
+public abstract class GameObject extends Rectangle {
 
-public class GameObject {
-    private final AtomicInteger x;
-    private final AtomicInteger y;
-    private int speed;
-    private final AtomicInteger width;
-    private final AtomicInteger height;
-    private final LayerDraw layer;
-    private Color color = Color.white;
-
-    public GameObject() {
+    protected GameObject() {
         this(0, 0, 0, 0);
     }
 
-    protected GameObject(GameObject object) {
-        this(object.getX(), object.getY(), object.getWidth(), object.getHeight());
+    protected GameObject(GameObject obj) {
+        this(obj.x, obj.y, obj.width, obj.height);
     }
 
-    public GameObject(int x, int y, int width, int height) {
-        this(x, y, width, height, null);
-    }
-
-    protected GameObject(int x, int y, int width, int height, LayerDraw layer) {
-        this.x = new AtomicInteger(x);
-        this.y = new AtomicInteger(y);
-        this.width = new AtomicInteger(width);
-        this.height = new AtomicInteger(height);
-        this.layer = layer;
-    }
-
-
-    public int getX() {
-        return x.get();
-    }
-
-    public void setX(int x) {
-        this.x.set(x);
-    }
-
-    public void addX(int x) {
-        this.x.addAndGet(x);
-    }
-
-    public int getY() {
-        return y.get();
-    }
-
-    public void setY(int y) {
-        this.y.set(y);
-    }
-
-    public void addY(int y) {
-        this.y.addAndGet(y);
-    }
-
-    public void setPos(int x, int y) {
-        this.x.set(x);
-        this.y.set(y);
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public int getWidth() {
-        return width.get();
-    }
-
-    public void setWidth(int width) {
-        this.width.set(width);
-    }
-
-    public int getHeight() {
-        return height.get();
-    }
-
-    public void setHeight(int height) {
-        this.height.set(height);
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
+    protected GameObject(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 }
