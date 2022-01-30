@@ -27,6 +27,9 @@ public class Player extends PhysicsObject implements Update, Collidable {
 
     private boolean canJump = true;
 
+    private int coso = 1000;
+    long last_time = System.nanoTime();
+
     @Override
     public void update() {
         //TODO:: THIS IS A TEST FOR MOVING GAMEOBJECTS AND THEIR COLLISIONS
@@ -48,12 +51,23 @@ public class Player extends PhysicsObject implements Update, Collidable {
 
         objCollider.checkForOnCollision();
         applyGravity();
+
+
+        coso -= 16;
+        if (coso <= 0) {
+            coso = 1000;
+            System.out.println("Segundo");
+        }
     }
 
     @Override
-    public void onCollide(Collider col) {
+    public void onCollisionEnter(Collider col) {
+        System.out.println("Collision enter with: " + col);
+    }
 
-        System.out.println("Collision with: " + col);
+    @Override
+    public void onCollisionLeave(Collider col) {
+        System.out.println("Collision leave with: " + col);
     }
 
 

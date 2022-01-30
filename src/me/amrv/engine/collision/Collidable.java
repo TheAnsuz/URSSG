@@ -1,5 +1,7 @@
 package me.amrv.engine.collision;
 
 public interface Collidable {
-    void onCollide(Collider col);
+    void onCollisionEnter(Collider col);
+
+    void onCollisionLeave(Collider col);
 }

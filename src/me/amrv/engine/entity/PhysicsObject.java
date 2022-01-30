@@ -43,10 +43,10 @@ public abstract class PhysicsObject extends GameObject {
     protected float fallingSpeed;
 
     protected void applyGravity() {
-//        if (isGrounded() && fallingSpeed > 0) {
-//            fallingSpeed = 0;
-//            return;
-//        }
+        if (isGrounded() && fallingSpeed > 0) {
+            fallingSpeed = 0;
+            return;
+        }
 
         moveVertical((int) fallingSpeed);
         if (fallingSpeed < maxVerticalSpeed)
@@ -100,7 +100,7 @@ public abstract class PhysicsObject extends GameObject {
     }
 
     protected void setGroundChecker() {
-        this.groundChecker.setLine(new Point2D.Float(x + 1, y + height), new Point2D.Float(x + width - 1, y + height));
+        this.groundChecker.setLine(new Point2D.Float(x + 1, y + height + 1), new Point2D.Float(x + width - 1, y + height + 1));
     }
 
     protected boolean isGrounded() {

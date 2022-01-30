@@ -24,7 +24,7 @@ public class LayerDraw implements Drawer {
     }
 
     public void add(Shape obj) {
-        if (!renderPool.contains(obj)) renderPool.add(obj);
+         renderPool.add(obj);
     }
 
     public void remove(Shape obj) {

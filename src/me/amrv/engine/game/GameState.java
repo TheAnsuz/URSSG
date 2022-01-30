@@ -7,6 +7,7 @@ import me.amrv.engine.collision.CollisionList;
 import me.amrv.engine.window.Window;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class GameState {
     public enum State {
@@ -37,7 +38,7 @@ public class GameState {
         CollisionList.addToSceneCollision(new Rectangle(350, 240, 100, 300));
         CollisionList.addToSceneCollision(new Rectangle(50, 50, 50, 50));
         CollisionList.addToSceneCollision(new Rectangle(0, 450, 900, 50));
-        CollisionList.addToSceneCollision(new Polygon(new int[]{900, 1100, 1400}, new int[]{450, 400, 400}, 3));
+        CollisionList.addToSceneCollision(new Polygon(new int[]{900, 1100, 1400, 1400, 900}, new int[]{450, 400, 400, 550, 550}, 5));
 
         CollisionList.collisions.add(new Collider(600, 350, 40, 40, null, Collider.Layer.ENEMY, true));
         CollisionList.collisions.add(new Collider(650, 350, 40, 40, null));
@@ -57,6 +58,7 @@ public class GameState {
         wireframeLayer.add(player.getGroundChecker());
         wireframeLayer.add(player.getObjCollisionDetector());
         wireframeLayer.add(CollisionList.sceneCollision);
+
 
         //fillLayer.add(CollisionList.collisions.get(1));
         CollisionList.collisions.forEach(wireframeLayer::add);

@@ -5,6 +5,7 @@ import me.amrv.engine.entity.GameObject;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 public class Collider extends GameObject {
@@ -80,7 +81,7 @@ public class Collider extends GameObject {
     }
 
 
-    private final ArrayList<Collider> currentCollisions = new ArrayList<>();
+    private final LinkedList<Collider> currentCollisions = new LinkedList<>();
 
     /**
      * Detects any object that is touching the collider and sends an onCollision to the parent object
@@ -91,16 +92,25 @@ public class Collider extends GameObject {
             if (this.intersects(col) && col.active) {
                 if (!currentCollisions.contains(col)) {
                     currentCollisions.add(col);
-                    onCollision(col);
+                    onCollisionEnter(col);
                 }
-            } else currentCollisions.remove(col);
+            } else if (currentCollisions.contains(col)){
+                onCollisionLeave(col);
+                currentCollisions.remove(col);
+            }
     }
 
 
-    private void onCollision(Collider col) {
+    private void onCollisionEnter(Collider col) {
         if (parentObject == null) return;
 
-        parentObject.onCollide(col);
+        parentObject.onCollisionEnter(col);
+    }
+
+    private void onCollisionLeave(Collider col) {
+        if (parentObject == null) return;
+
+        parentObject.onCollisionLeave(col);
     }
 
     public Layer getLayer() {

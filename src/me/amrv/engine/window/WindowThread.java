@@ -8,7 +8,7 @@ public class WindowThread implements Runnable {
 
 	private final WindowDrawer drawer;
 	private final Thread thread;
-	private int renderLatency = 16;
+	private int renderLatency = 0;
 	private boolean paused;
 	
 	protected WindowThread(WindowDrawer drawer) {
