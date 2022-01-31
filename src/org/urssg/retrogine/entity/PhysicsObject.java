@@ -3,21 +3,23 @@ package org.urssg.retrogine.entity;
 import org.urssg.retrogine.collision.Collider;
 import org.urssg.retrogine.collision.CollisionList;
 
+import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public abstract class PhysicsObject extends GameObject {
     // These are the default values that feel right for the player
     protected int speed = 3;
-    protected final float gravity = 0.7f;
+    protected final float gravity = 0.85f;
     protected int maxVerticalSpeed = 20;
-    protected float jumpForce = -10f;
-    protected float longJumpReduction = -3f;
+    protected float jumpForce = -7.1f;
+    protected float longJumpReduction = -0.67f;
+    protected float longJumpThreshold = -5.5f;
 
 
     private final Line2D groundChecker = new Line2D.Double();
-    private Collider collider;
-    private Collider objCollisionDetector;
+    private Collider collider = new Collider();
+    private Collider objCollisionDetector = new Collider();
 
     protected PhysicsObject(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -43,10 +45,10 @@ public abstract class PhysicsObject extends GameObject {
     protected float fallingSpeed;
 
     protected void applyGravity() {
-        if (isGrounded() && fallingSpeed > 0) {
-            fallingSpeed = 0;
-            return;
-        }
+//        if (isGrounded() && fallingSpeed > 0) {
+//            fallingSpeed = 0;
+//            return;
+//        }
 
         moveVertical((int) fallingSpeed);
         if (fallingSpeed < maxVerticalSpeed)
@@ -58,41 +60,53 @@ public abstract class PhysicsObject extends GameObject {
     }
 
     protected void longJump() {
-        if (fallingSpeed < -11f) fallingSpeed += longJumpReduction;
+        if (fallingSpeed < longJumpThreshold) fallingSpeed += longJumpReduction;
     }
 
 
     // Moving horizontally and vertically have to be separated into different methods because
     // the intersections would give wrong values for width in vertical and height in horizontal
     protected void moveHorizontal(int horizontalInput) {
-        collider.translate(horizontalInput * speed, 0);
+        if (!collider.isEmpty()) {
+            collider.translate(horizontalInput * speed, 0);
 
-        if (isColliding()) {
-            int inputSign = (int) Math.signum(horizontalInput);
-            collider.translate(-inputSign * collider.getSceneCollisionArea().width, 0);
-            collider.translate(-inputSign * collider.getObjectCollision().width, 0);
-        }
+            if (isColliding()) {
+                int inputSign = (int) Math.signum(horizontalInput);
 
-        setLocation(collider.x, collider.y);
-        objCollisionDetector.setLocation(x - 1, y - 1);
-        setGroundChecker();
+                // Checks wether the collision is actually a slope and moves it diagonally if it is
+                Collider slopeCol = new Collider(collider);
+                slopeCol.translate(inputSign, -speed);
+                if (!slopeCol.isColliding())
+                    collider.setLocation(slopeCol.x, slopeCol.y);
+                else {
+                    collider.translate(-inputSign * collider.getSceneCollisionArea().width, 0);
+                    collider.translate(-inputSign * collider.getObjectCollision().width, 0);
+                }
+            }
+
+            setLocation(collider.x, collider.y);
+            objCollisionDetector.setLocation(x - 1, y - 1);
+            setGroundChecker();
+        }  else setLocation(x + horizontalInput, y);
     }
 
     protected void moveVertical(int verticalInput) {
-        collider.translate(0, verticalInput);
+        if (!collider.isEmpty()) {
+            collider.translate(0, verticalInput);
 
-        if (isColliding()) {
-            int inputSign = (int) Math.signum(verticalInput);
-            collider.translate(0, -inputSign * collider.getSceneCollisionArea().height);
-            collider.translate(0, -inputSign * collider.getObjectCollision().height);
-            // This line makes it so that when jumping and bumping against a ceiling, you
-            // don't float until the jump time ends
-            fallingSpeed = 0;
-        }
+            if (isColliding()) {
+                int inputSign = (int) Math.signum(verticalInput);
+                collider.translate(0, -inputSign * collider.getSceneCollisionArea().height);
+                collider.translate(0, -inputSign * collider.getObjectCollision().height);
+                // This line makes it so that when jumping and bumping against a ceiling, you
+                // don't float until the jump time ends
+                fallingSpeed = 0;
+            }
 
-        setLocation(collider.x, collider.y);
-        objCollisionDetector.setLocation(x - 1, y - 1);
-        setGroundChecker();
+            setLocation(collider.x, collider.y);
+            objCollisionDetector.setLocation(x - 1, y - 1);
+            setGroundChecker();
+        } else setLocation(x, y + verticalInput);
     }
 
     public Line2D getGroundChecker() {
@@ -100,7 +114,7 @@ public abstract class PhysicsObject extends GameObject {
     }
 
     protected void setGroundChecker() {
-        this.groundChecker.setLine(new Point2D.Float(x + 1, y + height + 1), new Point2D.Float(x + width - 1, y + height + 1));
+        this.groundChecker.setLine(new Point2D.Float(x + 1, y + height + 5), new Point2D.Float(x + width - 1, y + height + 5));
     }
 
     protected boolean isGrounded() {

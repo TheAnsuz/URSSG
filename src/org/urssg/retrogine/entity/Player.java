@@ -30,9 +30,6 @@ public class Player extends PhysicsObject implements Update, Collidable {
 
     @Override
     public void update() {
-        //TODO:: THIS IS A TEST FOR MOVING GAMEOBJECTS AND THEIR COLLISIONS
-        state.moveColliderTest.translate(1, 0);
-
         if (inputManager != null) {
             int horizontalInput = !inputManager.isPressed(Key.D) ? (!inputManager.isPressed(Key.A) ? 0 : -1) : 1;
             if (horizontalInput != 0) moveHorizontal(horizontalInput);
