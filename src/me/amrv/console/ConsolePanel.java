@@ -4,193 +4,246 @@
  */
 package me.amrv.console;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.font.GlyphVector;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 /**
  *
  * @author marruiad
  */
-public class ConsolePanel extends JPanel {
+public class ConsolePanel extends JComponent {
 
+    private static final long serialVersionUID = 8212460406013016074L;
     private static final char WIDTH_MODEL = '#';
-    private transient final List<LineContext> lines;
-    private StringBuilder editLine = new StringBuilder("> ");
-    private int offset;
+    private static final int marginLeft = 1;
+    private static final String defaultEdit = "> ";
+    private static final long cursorUpdate = 500;
+
+    private ConsoleStyle style = new DefaultConsoleStyle();
+    private transient final List<String> lines = new ArrayList<>();
+    private StringBuilder editLine = new StringBuilder(defaultEdit);
+    private int offset = 0;
     private int maxLines;
     private int maxColumns;
-    
+
     public ConsolePanel(Font font, int columns, int lines) {
-        super(null, true);
-        this.offset = 0;
+        super();
+        ConsolePanelEventHandler handler = new ConsolePanelEventHandler();
+        super.setFont(font);
+        this.setSizeInChars(columns, lines);
+        super.setPreferredSize(super.getSize());
         this.maxLines = lines;
         this.maxColumns = columns;
-        this.lines = new ArrayList<>();
-        setSizeInChars(columns, lines);
-        super.setPreferredSize(super.getSize());
-        super.setBackground(Color.BLACK);
-        super.setForeground(Color.WHITE);
+        this.style.loadModel(getFontMetrics().charWidth(WIDTH_MODEL),
+                (getFontMetrics().getAscent() + getFontMetrics().getDescent()));
+        this.setFocusable(true);
+        this.addMouseWheelListener(handler);
+        this.addKeyListener(handler);
+        this.setFocusTraversalKeysEnabled(false);
+    }
+
+    public void setConsoleStyle(ConsoleStyle style) {
+        style.loadModel(getFontMetrics().charWidth(WIDTH_MODEL),
+                (getFontMetrics().getAscent() + getFontMetrics().getDescent()));
+        this.style = style;
     }
 
     public void addLine(CharSequence text) {
-        lines.add(new LineContext(text));
+        lines.add(text.toString());
         repaint();
     }
-    
+
     public void setLastLine(CharSequence text) {
         editLine.setLength(0);
         editLine.append(text);
         repaint();
     }
-    
+
     public void addLastLine(CharSequence text) {
         editLine.append(text);
         repaint();
     }
-    
+
     public void removeLastLine() {
         editLine.setLength(0);
+        editLine.append(defaultEdit);
         repaint();
     }
-    
+
     public FontMetrics getFontMetrics() {
-        return super.getFontMetrics(super.getFont());
+        return this.getFontMetrics(this.getFont());
     }
 
+    // Not using a monospaced font may cause errors on the width calculation
+    // however as a preset character is used, this is more accurate
     private void setSizeInChars(int columns, int lines) {
-        super.setSize(
-                getFontMetrics().charWidth(WIDTH_MODEL) * columns,
-                (getFontMetrics().getAscent() + getFontMetrics().getDescent()) * lines
-        );
+        final int width = getFontMetrics().charWidth(WIDTH_MODEL) * columns;
+        final int height = (getFontMetrics().getAscent() + getFontMetrics().getDescent()) * lines;
+        super.setSize(width, height);
     }
 
     @Override
-    public synchronized void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
-        g.setColor(getBackground());
+    public void paint(Graphics g) {
+        final Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHints(style.rendering);
+        this.paint(g2);
+    }
+
+    private synchronized void paint(Graphics2D g) {
+        g.setColor(style.background);
         g.fillRect(getBounds().x, getBounds().y, getBounds().width, getBounds().height);
-        g.setColor(getForeground());
+        g.setColor(style.foreground);
 
-        if (offset >= lines.size())
-            return;
-
-        /*
-         * Line 0
-         * Line 1
-         * Line 2
-         * Line 3
-         * Line 4
-         * Line 5 -- screen minimun
-         * Line 6
-         * Line 7
-         * Line 8
-         * Line 9
-         * Line 10
-         * Line 11
-         * Line 12
-         * Line 13
-         * Line 14 -- screen maximun
-         * Line 15
-         * Line 16
-         * 
-         * EditLine
-        */
+        final int increment = getFontMetrics().getAscent() + getFontMetrics().getDescent();
         int position = getFontMetrics().getAscent();
-        System.out.println("> " + lines.subList(offset, offset+maxLines-1).size());
-        for (LineContext line : lines.subList(offset, Math.min(offset+maxLines-1, lines.size()))) {
-            int width = 0;
-            for (Object o : line.format()) {
-                if (o == null)
-                    continue;
-                
-                if (o instanceof Color)
-                    g2.setColor((Color) o);
-                else {
-                    g2.drawGlyphVector(getGlyph(g2, o.toString()), width, position);
-                    width += getFontMetrics().stringWidth(o.toString());
-                }
+
+        for (int i = 0; i < maxColumns; i++) {
+            if (i + offset >= lines.size())
+                break;
+
+            paintLine(g, lines.get(i + offset), marginLeft, position);
+            position += increment;
+        }
+        g.setColor(style.foreground);
+        position += increment;
+        g.drawString(editLine.toString(), marginLeft, position);
+    }
+
+    private void paintLine(Graphics2D g, String line, int x, int y) {
+        StringBuilder actual = new StringBuilder();
+        int width = x;
+//        System.out.print(line + " > ");
+        for (char c : line.toCharArray()) {
+//            System.out.println(">>> " + c + "(" + Integer.valueOf(c) + ") ");
+            if (c > Character.MIN_CODE_POINT && c < Character.MAX_HIGH_SURROGATE)
+                // Write character as normal
+                actual.append(c);
+            else if (c == 0) {
+                // works as a buffer clearer
+                width += print(g, actual.toString(), width, y);
+                actual.setLength(0);
+            } else {
+                // Change output color model
+                if (style.model.contains(c))
+                    g.setColor(style.model.getColorModel(c));
             }
-            position += getFontMetrics().getAscent() + getFontMetrics().getDescent();
         }
-        // Let the console have one line between last printed line and the edit line
-        position += getFontMetrics().getAscent() + getFontMetrics().getDescent();
-        g.setColor(Color.WHITE);
-        g2.drawGlyphVector(getGlyph(g2, editLine.toString()), 0, position);
+        if (actual.length() > 0)
+            print(g, actual.toString(), width, y);
+//        System.out.println();
     }
 
-    private GlyphVector getGlyph(Graphics2D g2, String text) {
-        return getFont().createGlyphVector(g2.getFontRenderContext(), text);
-    }
-    
-    private static boolean isVaidChar(char c) {
-        return (c >= 32 && c <= 126) || (c >= 161 && c <= 382);
+    // returns the width of the inserted sequence
+    private int print(Graphics2D g, String chars, int x, int y) {
+        g.drawString(chars, x, y);
+        return getFontMetrics().stringWidth(chars);
     }
 
-    
-    
-    private final class LineContext implements CharSequence {
+    class ConsolePanelCursorProcesser implements Runnable {
 
-        private final StringBuffer buffer;
+        private final Thread thread;
+        private long updateT = 500;
 
-        public LineContext() {
-            buffer = new StringBuffer();
-        }
-        
-        public LineContext(CharSequence text) {
-            buffer = new StringBuffer(text);
-        }
-        
-        public void append(CharSequence chars) {
-            buffer.append(chars);
+        ConsolePanelCursorProcesser() {
+            thread = new Thread(this);
+
         }
 
         @Override
-        public int length() {
-            return buffer.length();
+        public void run() {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    class ConsolePanelEventHandler implements MouseWheelListener, KeyListener {
+
+        private boolean isValidCharacter(char c) {
+            return (c > 31 && c < 127) || (c > 160 && c < 256);
         }
 
         @Override
-        public char charAt(int index) {
-            return buffer.charAt(index);
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            final int units = e.getScrollAmount() * e.getWheelRotation();
+
+//			offset = units < 0 ? (offset + units < 0 ? 0 : offset + units) : (offset + units > lines.size() - maxLines + 2 ? lines.size() - maxLines + 2 : offset + units);
+            offset = units < 0 ? Math.max(offset + units, 0) : Math.min(offset + units, lines.size() - maxLines + 2);
+
+            repaint();
+            e.consume();
         }
 
         @Override
-        public CharSequence subSequence(int start, int end) {
-            return buffer.subSequence(start, end);
-        }
-
-        @Override
-        public IntStream chars() {
-            return buffer.chars();
-        }
-
-        @Override
-        public IntStream codePoints() {
-            return buffer.codePoints();
-        }
-
-        public Object[] format() {
-            List<Object> segments = new ArrayList<>();
-            StringBuilder actual = new StringBuilder();
-            segments.add(actual);
-            for (char c : buffer.toString().toCharArray()) {
-                if (isVaidChar(c)) {
-                    actual.append(c);
-                } else {
-                    segments.add( c < 250 ? Color.RED : Color.GREEN );
-                    actual = new StringBuilder();
-                    segments.add(actual);
-                }
+        public void keyTyped(KeyEvent e) {
+            if (isValidCharacter(e.getKeyChar())) {
+                editLine.append(e.getKeyChar());
+                repaint();
+                return;
             }
-            return segments.toArray();
+
+            switch (e.getKeyChar()) {
+                case 8: // Backspace
+                    if (editLine.length() > defaultEdit.length())
+                        editLine.deleteCharAt(editLine.length() - 1);
+                    break;
+                case 127: // Suprimir <-
+                    if (editLine.length() > defaultEdit.length())
+                        editLine.delete(editLine.lastIndexOf(" ") < 0 ? defaultEdit.length() : (editLine.lastIndexOf(" ") + 1 >= editLine.length() ? editLine.length() - 1 : editLine.lastIndexOf(" ") + 1), editLine.length());
+                    break;
+                case 22: // Pegar
+				try {
+                    editLine.append(Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+                } catch (HeadlessException | UnsupportedFlavorException | IOException e1) {
+                    // Not a valid string to get from clipborard
+                }
+                break;
+                case 10: // Intro
+                    if (editLine.indexOf(defaultEdit) > 0)
+                        editLine.delete(editLine.indexOf(defaultEdit), editLine.length());
+
+                    addLine(editLine.toString());
+                    editLine.setLength(0);
+                    editLine.append(defaultEdit);
+                    break;
+                case 1:
+                    editLine.append((Character.MAX_HIGH_SURROGATE + 2));
+                    break;
+                case 19:
+                    editLine.append((Character.MAX_HIGH_SURROGATE + 3));
+                    break;
+                case 4:
+                    editLine.append((Character.MAX_HIGH_SURROGATE + 4));
+                    break;
+                default:
+                    System.out.println("Character not valid " + Integer.valueOf(e.getKeyChar()) + " " + e.getKeyChar() + " "
+                            + KeyEvent.getKeyText(e.getKeyChar()));
+            }
+
+            repaint();
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+
         }
 
     }

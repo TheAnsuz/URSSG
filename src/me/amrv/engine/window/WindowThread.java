@@ -8,22 +8,22 @@ public class WindowThread implements Runnable {
 
 	private final WindowDrawer drawer;
 	private final Thread thread;
-	private int renderLatency = 0;
+	private int renderLatency = 16;
 	private boolean paused;
-	
+
 	protected WindowThread(WindowDrawer drawer) {
 		this.drawer = drawer;
 		this.thread = new Thread(this);
 	}
-	
+
 	protected void setLatency(int latency) {
 		this.renderLatency = latency;
 	}
-	
+
 	public int getLatency() {
 		return this.renderLatency;
 	}
-	
+
 	protected void start() {
 		thread.start();
 	}
@@ -31,11 +31,11 @@ public class WindowThread implements Runnable {
 	protected void pause(boolean pause) {
 		this.paused = pause;
 	}
-	
+
 	public boolean isPaused() {
 		return this.paused;
 	}
-	
+
 	protected void stop() {
 		try {
 			thread.join();
