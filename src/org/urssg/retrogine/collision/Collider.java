@@ -1,10 +1,9 @@
-package me.amrv.engine.collision;
+package org.urssg.retrogine.collision;
 
-import me.amrv.engine.entity.GameObject;
+import org.urssg.retrogine.entity.GameObject;
 
 import java.awt.Rectangle;
 import java.awt.geom.Area;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 

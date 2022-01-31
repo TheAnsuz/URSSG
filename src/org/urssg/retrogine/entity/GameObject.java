@@ -1,4 +1,4 @@
-package me.amrv.engine.entity;
+package org.urssg.retrogine.entity;
 
 import java.awt.Rectangle;
 

@@ -1,4 +1,4 @@
-package me.amrv.engine.collision;
+package org.urssg.retrogine.collision;
 
 import java.awt.*;
 import java.awt.geom.Area;

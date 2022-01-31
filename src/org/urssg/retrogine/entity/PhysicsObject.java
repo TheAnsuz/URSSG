@@ -1,18 +1,18 @@
-package me.amrv.engine.entity;
+package org.urssg.retrogine.entity;
 
-import me.amrv.engine.collision.Collider;
-import me.amrv.engine.collision.CollisionList;
+import org.urssg.retrogine.collision.Collider;
+import org.urssg.retrogine.collision.CollisionList;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public abstract class PhysicsObject extends GameObject {
     // These are the default values that feel right for the player
-    protected int speed = 8;
-    protected final float gravity = 2f;
-    protected int maxVerticalSpeed = 30;
-    protected float jumpForce = -17f;
-    protected float longJumpReduction = -1.6f;
+    protected int speed = 3;
+    protected final float gravity = 0.7f;
+    protected int maxVerticalSpeed = 20;
+    protected float jumpForce = -10f;
+    protected float longJumpReduction = -3f;
 
 
     private final Line2D groundChecker = new Line2D.Double();

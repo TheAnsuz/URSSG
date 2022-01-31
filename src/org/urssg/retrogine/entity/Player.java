@@ -1,10 +1,11 @@
-package me.amrv.engine.entity;
+package org.urssg.retrogine.entity;
 
-import me.amrv.engine.game.GameState;
-import me.amrv.engine.game.Update;
-import me.amrv.engine.input.InputManager;
-import me.amrv.engine.collision.Collidable;
-import me.amrv.engine.collision.Collider;
+import org.urssg.retrogine.game.GameState;
+import org.urssg.retrogine.game.Update;
+import org.urssg.retrogine.collision.Collidable;
+import org.urssg.retrogine.collision.Collider;
+import org.urssg.retrogine.input.InputManager;
+import org.urssg.retrogine.input.Key;
 
 public class Player extends PhysicsObject implements Update, Collidable {
     private final Collider objCollider = new Collider(x - 1, y - 1, width + 2, height + 2, this);
@@ -27,19 +28,16 @@ public class Player extends PhysicsObject implements Update, Collidable {
 
     private boolean canJump = true;
 
-    private int coso = 1000;
-    long last_time = System.nanoTime();
-
     @Override
     public void update() {
         //TODO:: THIS IS A TEST FOR MOVING GAMEOBJECTS AND THEIR COLLISIONS
         state.moveColliderTest.translate(1, 0);
 
         if (inputManager != null) {
-            int horizontalInput = !inputManager.isRightPressed() ? (!inputManager.isLeftPressed() ? 0 : -1) : 1;
+            int horizontalInput = !inputManager.isPressed(Key.D) ? (!inputManager.isPressed(Key.A) ? 0 : -1) : 1;
             if (horizontalInput != 0) moveHorizontal(horizontalInput);
 
-            if (inputManager.isUpPressed()) {
+            if (inputManager.isPressed(Key.SPACE)) {
                 // Removes the ability to keep jump button pressed and jump constantly
                 if (canJump)
                     jump();
@@ -51,13 +49,6 @@ public class Player extends PhysicsObject implements Update, Collidable {
 
         objCollider.checkForOnCollision();
         applyGravity();
-
-
-        coso -= 16;
-        if (coso <= 0) {
-            coso = 1000;
-            System.out.println("Segundo");
-        }
     }
 
     @Override

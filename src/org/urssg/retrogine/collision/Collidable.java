@@ -1,4 +1,4 @@
-package me.amrv.engine.collision;
+package org.urssg.retrogine.collision;
 
 public interface Collidable {
     void onCollisionEnter(Collider col);

@@ -1,4 +1,4 @@
-package me.amrv.engine.game;
+package org.urssg.retrogine.game;
 
 public interface Update {
     void update();
