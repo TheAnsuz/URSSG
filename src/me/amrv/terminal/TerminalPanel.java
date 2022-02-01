@@ -2,16 +2,15 @@ package me.amrv.terminal;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
-
 import javax.swing.JComponent;
 
-// El tamaño debe de poder cambiarse en pixeles y caracteres
+// El tamaï¿½o debe de poder cambiarse en pixeles y caracteres
 // 
 
 public class TerminalPanel extends JComponent {
 
 	private static final long serialVersionUID = -3836678159417978463L;
-	private static final char WIDTH_MODEL = '#';
+	private static final char WIDTH_MODEL = '0';
 
 	public TerminalPanel() {
 		this(new Font(Font.DIALOG_INPUT, Font.PLAIN, 14), 121, 36);
