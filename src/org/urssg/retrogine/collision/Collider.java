@@ -1,6 +1,7 @@
 package org.urssg.retrogine.collision;
 
 import org.urssg.retrogine.entity.GameObject;
+import org.urssg.retrogine.game.level.Level;
 
 import java.awt.Rectangle;
 import java.awt.geom.Area;
@@ -13,27 +14,26 @@ public class Collider extends GameObject {
         DEFAULT, PLAYER, PLAYER_BULLET, ENEMY, ENEMY_BULLET
     }
 
-    public Collider() {
-        super();
-    }
-
     public Collider(GameObject obj) {
         this(obj, null);
+        this.setLevel(obj.getLevel());
     }
 
     public Collider(GameObject obj, Collidable col) {
-        this(obj.x, obj.y, obj.width, obj.height, col);
+        this(obj.x, obj.y, obj.width, obj.height, col, obj.getLevel());
+        setLevel(obj.getLevel());
     }
 
-    public Collider(int x, int y, int width, int height, Collidable parentObject) {
-        this(x, y, width, height, parentObject, Layer.DEFAULT, false);
+    public Collider(int x, int y, int width, int height, Collidable parentObject, Level level) {
+        this(x, y, width, height, parentObject, Layer.DEFAULT, false, level);
     }
 
-    public Collider(int x, int y, int width, int height, Collidable parentObject, Layer layer, boolean trigger) {
+    public Collider(int x, int y, int width, int height, Collidable parentObject, Layer layer, boolean trigger, Level level) {
         super(x, y, width, height);
         this.layer = layer;
         this.trigger = trigger;
         this.parentObject = parentObject;
+        setLevel(level);
     }
 
 
@@ -50,12 +50,12 @@ public class Collider extends GameObject {
     }
 
     private boolean checkSceneCollision() {
-        return CollisionList.sceneCollision.intersects(this);
+        return level.getSceneCollision().intersects(this);
     }
 
     public Rectangle getSceneCollisionArea() {
         Area sceneCollision = new Area();
-        sceneCollision.add(CollisionList.sceneCollision);
+        sceneCollision.add(new Area(level.getSceneCollision()));
         sceneCollision.intersect(new Area(this));
 
         return sceneCollision.getBounds();
@@ -71,7 +71,7 @@ public class Collider extends GameObject {
     public Rectangle getObjectCollision() {
         Area areaOfCOllisions = new Area();
 
-        for (Collider col : CollisionList.collisions)
+        for (Collider col : level.getCollisions())
             if (this.intersects(col) && col.active && !col.trigger)
                 areaOfCOllisions.add(new Area(col));
 
@@ -87,8 +87,8 @@ public class Collider extends GameObject {
      * with all the collider information.
      */
     public void checkForOnCollision() {
-        for (Collider col : CollisionList.collisions)
-            if (this.intersects(col) && col.active) {
+        for (Collider col : level.getCollisions())
+            if (intersects(col) && col.active && !col.equals(this)) {
                 if (!currentCollisions.contains(col)) {
                     currentCollisions.add(col);
                     onCollisionEnter(col);

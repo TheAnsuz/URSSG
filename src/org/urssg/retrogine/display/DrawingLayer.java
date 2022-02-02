@@ -1,30 +1,42 @@
 package org.urssg.retrogine.display;
 
 import java.awt.*;
-import java.awt.geom.Area;
 import java.util.ArrayList;
 
 public class DrawingLayer implements RenderLayer {
 
-    ArrayList<Shape> renderPool = new ArrayList<>();
-    private boolean active;
+    private final ArrayList<Shape> renderPool = new ArrayList<>();
+    // Objects to add/remove in the next iteration. Fixes concurrentModification exception
+    private final ArrayList<Shape> toAdd = new ArrayList<>();
+    private final ArrayList<Shape> toRemove = new ArrayList<>();
+
+    private boolean active = true;
 
     @Override
     public void draw(Graphics2D g, int width, int height) {
-        if (active) {
+        if (!toAdd.isEmpty() || !toRemove.isEmpty())
+            addRemove();
+
+        if (active && !renderPool.isEmpty()) {
             g.setColor(Color.RED);
-            for (Shape object : renderPool) {
+            for (Shape object : renderPool)
                 g.draw(object);
-            }
         }
     }
 
+    private void addRemove() {
+        renderPool.addAll(toAdd);
+        toAdd.clear();
+        renderPool.removeAll(toRemove);
+        toRemove.clear();
+    }
+
     public void add(Shape obj) {
-         renderPool.add(obj);
+        toAdd.add(obj);
     }
 
     public void remove(Shape obj) {
-        renderPool.remove(obj);
+        toRemove.add(obj);
     }
 
     public boolean isActive() {

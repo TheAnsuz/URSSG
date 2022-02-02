@@ -3,7 +3,6 @@ package org.urssg.retrogine.entity;
 import org.urssg.retrogine.collision.Collider;
 import org.urssg.retrogine.collision.CollisionList;
 
-import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -18,8 +17,8 @@ public abstract class PhysicsObject extends GameObject {
 
 
     private final Line2D groundChecker = new Line2D.Double();
-    private Collider collider = new Collider();
-    private Collider objCollisionDetector = new Collider();
+    private Collider collider;
+    private Collider objCollisionDetector;
 
     protected PhysicsObject(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -87,7 +86,10 @@ public abstract class PhysicsObject extends GameObject {
             setLocation(collider.x, collider.y);
             objCollisionDetector.setLocation(x - 1, y - 1);
             setGroundChecker();
-        }  else setLocation(x + horizontalInput, y);
+        }  else {
+            setLocation(x + horizontalInput, y);
+            objCollisionDetector.setLocation(x, y);
+        }
     }
 
     protected void moveVertical(int verticalInput) {
@@ -106,7 +108,10 @@ public abstract class PhysicsObject extends GameObject {
             setLocation(collider.x, collider.y);
             objCollisionDetector.setLocation(x - 1, y - 1);
             setGroundChecker();
-        } else setLocation(x, y + verticalInput);
+        }  else {
+            setLocation(x + verticalInput, y);
+            objCollisionDetector.setLocation(x, y);
+        }
     }
 
     public Line2D getGroundChecker() {
@@ -114,11 +119,11 @@ public abstract class PhysicsObject extends GameObject {
     }
 
     protected void setGroundChecker() {
-        this.groundChecker.setLine(new Point2D.Float(x + 1, y + height + 5), new Point2D.Float(x + width - 1, y + height + 5));
+        this.groundChecker.setLine(new Point2D.Float(x + 1f, y + height + 6f), new Point2D.Float(x + width - 1f, y + height + 6f));
     }
 
     protected boolean isGrounded() {
-        return CollisionList.sceneCollision.contains(groundChecker.getP1()) || CollisionList.sceneCollision.contains(groundChecker.getP2());
+        return level.getSceneCollision().contains(groundChecker.getP1()) || level.getSceneCollision().contains(groundChecker.getP2());
     }
 
     protected synchronized boolean isColliding() {

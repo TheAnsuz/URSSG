@@ -1,5 +1,5 @@
 package org.urssg.retrogine.game;
 
-public interface Update {
+public interface Updatable {
     void update();
 }
