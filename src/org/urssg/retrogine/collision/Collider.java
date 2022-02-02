@@ -16,12 +16,10 @@ public class Collider extends GameObject {
 
     public Collider(GameObject obj) {
         this(obj, null);
-        this.setLevel(obj.getLevel());
     }
 
     public Collider(GameObject obj, Collidable col) {
         this(obj.x, obj.y, obj.width, obj.height, col, obj.getLevel());
-        setLevel(obj.getLevel());
     }
 
     public Collider(int x, int y, int width, int height, Collidable parentObject, Level level) {
@@ -29,15 +27,14 @@ public class Collider extends GameObject {
     }
 
     public Collider(int x, int y, int width, int height, Collidable parentObject, Layer layer, boolean trigger, Level level) {
-        super(x, y, width, height);
+        super(x, y, width, height, level);
         this.layer = layer;
         this.trigger = trigger;
         this.parentObject = parentObject;
-        setLevel(level);
     }
 
 
-    protected Layer layer = Layer.DEFAULT;
+    protected Layer layer;
     private Collidable parentObject;
 
     protected boolean trigger;

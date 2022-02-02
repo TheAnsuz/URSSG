@@ -1,6 +1,7 @@
 package org.urssg.retrogine.game.level;
 
 import org.urssg.retrogine.collision.Collider;
+import org.urssg.retrogine.entity.GameObject;
 import org.urssg.retrogine.game.Updatable;
 
 import java.awt.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public final class Level1 {
 
-    public static final List<Collider> collisions = new ArrayList<>();
+    public static final List<GameObject> objects = new ArrayList<>();
     public static final Polygon sceneCollision = new Polygon(
             new int[]{
                     -11, -1,  -1,  50,  95, 120, 120, 150, 150, 210, 256, 256, 267, 267, -11

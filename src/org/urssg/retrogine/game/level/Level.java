@@ -1,8 +1,8 @@
 package org.urssg.retrogine.game.level;
 
 import org.urssg.retrogine.collision.Collider;
-import org.urssg.retrogine.collision.CollisionList;
 import org.urssg.retrogine.display.DrawingLayer;
+import org.urssg.retrogine.entity.GameObject;
 import org.urssg.retrogine.entity.PhysicsObject;
 import org.urssg.retrogine.entity.Player;
 import org.urssg.retrogine.game.Camera;
@@ -10,14 +10,15 @@ import org.urssg.retrogine.game.Updatable;
 import org.urssg.retrogine.game.UpdateThread;
 
 import java.awt.*;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
     private final List<Collider> collisions = new ArrayList<>();
-    private Polygon sceneCollision;
+    private Area sceneCollision;
 
-    private Camera cam;
+    private final Camera cam;
 
     protected Player player;
     public UpdateThread thread1 = new UpdateThread(60);
@@ -27,13 +28,24 @@ public class Level {
     }
 
     public void setLevelCollision(Polygon col) {
-        sceneCollision = col;
+        sceneCollision = new Area(col);
         cam.getWireframeLayer().add(col);
     }
 
-    public void addLevelObject(PhysicsObject obj) {
-        collisions.add(obj.getCollider());
-        collisions.add(obj.getObjCollisionDetector());
+    public void addLevelObject(GameObject obj) {
+        if (obj instanceof PhysicsObject) {
+            PhysicsObject objPO = (PhysicsObject) obj;
+            addToWireframe(obj);
+            if (objPO.getCollider() != null) {
+                collisions.add(objPO.getCollider());
+                addToWireframe(objPO.getCollider());
+            }
+            if (objPO.getObjCollisionDetector() != null) {
+                collisions.add(objPO.getObjCollisionDetector());
+                addToWireframe(objPO.getObjCollisionDetector());
+            }
+            //addToWireframe(objPO.getGroundChecker());
+        }
     }
 
     public void removeLevelObject(PhysicsObject obj) {
@@ -49,28 +61,27 @@ public class Level {
         thread.remove(obj);
     }
 
-    public void addToRender(DrawingLayer layer, Shape shape) {
-        layer.add(shape);
+    public void addToWireframe(Shape shape) {
+        cam.getWireframeLayer().add(shape);
     }
 
     public void removeFromRender(DrawingLayer layer, Shape shape) {
         layer.remove(shape);
     }
 
-    public void setPlayer(Player player) {
+    public void startPlayer(Player player) {
         this.player = player;
-        player.setLevel(this);
         thread1.add(player);
 
-        cam.getWireframeLayer().add(player);
-        cam.getWireframeLayer().add(player.getGroundChecker());
+        addToWireframe(player);
+        addToWireframe(player.getGroundChecker());
     }
 
     public List<Collider> getCollisions() {
         return collisions;
     }
 
-    public Polygon getSceneCollision() {
+    public Area getSceneCollision() {
         return sceneCollision;
     }
 }

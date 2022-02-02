@@ -2,11 +2,12 @@ package org.urssg.retrogine.entity;
 
 import org.urssg.retrogine.collision.Collider;
 import org.urssg.retrogine.collision.CollisionList;
+import org.urssg.retrogine.game.level.Level;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-public abstract class PhysicsObject extends GameObject {
+public class PhysicsObject extends GameObject {
     // These are the default values that feel right for the player
     protected int speed = 3;
     protected final float gravity = 0.85f;
@@ -20,16 +21,12 @@ public abstract class PhysicsObject extends GameObject {
     private Collider collider;
     private Collider objCollisionDetector;
 
-    protected PhysicsObject(int x, int y, int width, int height) {
-        super(x, y, width, height);
-    }
-
-    protected PhysicsObject(int x, int y, int width, int height, int speed) {
-        super(x, y, width, height);
+    public PhysicsObject(int x, int y, int width, int height, int speed, Level level) {
+        super(x, y, width, height, level);
         this.speed = speed;
     }
 
-    protected void setCollider(Collider collider) {
+    public void setCollider(Collider collider) {
         this.collider = collider;
     }
 
@@ -44,11 +41,6 @@ public abstract class PhysicsObject extends GameObject {
     protected float fallingSpeed;
 
     protected void applyGravity() {
-//        if (isGrounded() && fallingSpeed > 0) {
-//            fallingSpeed = 0;
-//            return;
-//        }
-
         moveVertical((int) fallingSpeed);
         if (fallingSpeed < maxVerticalSpeed)
             fallingSpeed += gravity;
@@ -95,6 +87,7 @@ public abstract class PhysicsObject extends GameObject {
     protected void moveVertical(int verticalInput) {
         if (!collider.isEmpty()) {
             collider.translate(0, verticalInput);
+            System.out.println(isColliding());
 
             if (isColliding()) {
                 int inputSign = (int) Math.signum(verticalInput);
@@ -119,7 +112,7 @@ public abstract class PhysicsObject extends GameObject {
     }
 
     protected void setGroundChecker() {
-        this.groundChecker.setLine(new Point2D.Float(x + 1f, y + height + 6f), new Point2D.Float(x + width - 1f, y + height + 6f));
+        this.groundChecker.setLine(new Point2D.Float(x + 1f, y + height + 7), new Point2D.Float(x + width - 1f, y + height + 7));
     }
 
     protected boolean isGrounded() {

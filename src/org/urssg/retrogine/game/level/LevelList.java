@@ -1,22 +1,22 @@
 package org.urssg.retrogine.game.level;
 
-import org.urssg.retrogine.collision.Collider;
+import org.urssg.retrogine.entity.GameObject;
 import org.urssg.retrogine.game.Updatable;
 
 import java.awt.*;
 import java.util.List;
 
 public enum LevelList {
-    LEVEL1(Level1.sceneCollision, Level1.collisions, Level1.updatables),
-    LEVEL2(Level1.sceneCollision, Level1.collisions, Level1.updatables);
+    LEVEL1(Level1.sceneCollision, Level1.objects, Level1.updatables),
+    LEVEL2(Level1.sceneCollision, Level1.objects, Level1.updatables);
 
     private final Polygon sceneCollision;
-    private final java.util.List<Collider> collisions;
+    private final java.util.List<GameObject> objects;
     private final java.util.List<Updatable> updatables;
 
-    LevelList(Polygon sceneCollision, List<Collider> collisions, List<Updatable> updatables) {
+    LevelList(Polygon sceneCollision, List<GameObject> objects, List<Updatable> updatables) {
         this.sceneCollision = sceneCollision;
-        this.collisions = collisions;
+        this.objects = objects;
         this.updatables = updatables;
     }
 
@@ -24,8 +24,8 @@ public enum LevelList {
         return sceneCollision;
     }
 
-    public java.util.List<Collider> getCollisions() {
-        return collisions;
+    public java.util.List<GameObject> getCollisions() {
+        return objects;
     }
 
     public List<Updatable> getUpdatables() {

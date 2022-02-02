@@ -4,20 +4,19 @@ import org.urssg.retrogine.game.GameState;
 import org.urssg.retrogine.game.Updatable;
 import org.urssg.retrogine.collision.Collidable;
 import org.urssg.retrogine.collision.Collider;
+import org.urssg.retrogine.game.level.Level;
 import org.urssg.retrogine.input.InputManager;
 import org.urssg.retrogine.input.Key;
 
 public class Player extends PhysicsObject implements Updatable, Collidable {
-    private final Collider objCollider = new Collider(x - 1, y - 1, width + 2, height + 2, this, getLevel());
+    private final Collider objCollider = new Collider(x - 1, y - 1, width + 2, height + 2, this, level);
     public GameState state;
 
-    public Player(int x, int y, int speed, int width, int height) {
-        super(x, y, width, height, speed);
+    public Player(int x, int y, int speed, int width, int height, Level level) {
+        super(x, y, width, height, speed, level);
         Collider sceneCollider = new Collider(this);
         sceneCollider.setLayer(Collider.Layer.PLAYER);
-        sceneCollider.setLevel(level);
         setCollider(sceneCollider);
-        objCollider.setLevel(level);
         setObjCollisionDetector(objCollider);
         objCollider.setTrigger(true);
     }
@@ -46,7 +45,7 @@ public class Player extends PhysicsObject implements Updatable, Collidable {
             } else canJump = true;
         }
 
-        //objCollider.checkForOnCollision();
+        objCollider.checkForOnCollision();
         applyGravity();
     }
 
