@@ -78,19 +78,22 @@ public final class InternalFrame extends JComponent {
         float x = 0;
         float y = 0;
         
-        
-        if (parentSize.width > parentSize.height) {
-            // The screen is displaying horizontally
-
-            width = parentSize.height / (float) size.height * size.width;
-            x = parentSize.width / 2f - width / 2f;
-
-        } else {
-            // The screen is displaying vertically or cubiq
-            height = parentSize.width / (float) size.width * size.height;
-            y = parentSize.height / 2f - height / 2f;
-
-        }
+        x = parentSize.width > parentSize.height ? (parentSize.width - size.width) / 2f : 0;
+        y = parentSize.width > parentSize.height ? 0 : (parentSize.height - size.height) / 2f;
+        width = this.inside.getWidth();
+        height = this.inside.getHeight();
+//        if (parentSize.width > parentSize.height) {
+//            // The screen is displaying horizontally
+//
+//            width = parentSize.height / (float) size.height * size.width;
+//            x = parentSize.width / 2f - width / 2f;
+//
+//        } else {
+//            // The screen is displaying vertically or cubiq
+//            height = parentSize.width / (float) size.width * size.height;
+//            y = parentSize.height / 2f - height / 2f;
+//
+//        }
         size.setLocation(Math.round(x), Math.round(y));
         size.setSize(Math.round(width), Math.round(height));
         repaint();
