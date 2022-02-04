@@ -51,6 +51,7 @@ public class Player extends PhysicsObject implements Updatable, Collidable {
 
     @Override
     public void onCollisionEnter(Collider col) {
+        //level.getCam().setFocus(col);
         System.out.println("Collision enter with: " + col);
     }
 

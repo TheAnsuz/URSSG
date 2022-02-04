@@ -87,7 +87,6 @@ public class PhysicsObject extends GameObject {
     protected void moveVertical(int verticalInput) {
         if (!collider.isEmpty()) {
             collider.translate(0, verticalInput);
-            System.out.println(isColliding());
 
             if (isColliding()) {
                 int inputSign = (int) Math.signum(verticalInput);

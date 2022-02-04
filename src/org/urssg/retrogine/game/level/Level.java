@@ -25,6 +25,7 @@ public class Level {
 
     public Level(Camera cam) {
         this.cam = cam;
+        addToUpdateThread(thread1, cam);
     }
 
     public void setLevelCollision(Polygon col) {
@@ -44,13 +45,32 @@ public class Level {
                 collisions.add(objPO.getObjCollisionDetector());
                 addToWireframe(objPO.getObjCollisionDetector());
             }
-            //addToWireframe(objPO.getGroundChecker());
+            if (objPO.getGroundChecker() != null) addToWireframe(objPO.getGroundChecker());
+        }
+        if (obj instanceof Updatable) {
+            Updatable objUp = (Updatable) obj;
+            addToUpdateThread(thread1, objUp);
         }
     }
 
-    public void removeLevelObject(PhysicsObject obj) {
-        collisions.remove(obj.getCollider());
-        collisions.remove(obj.getObjCollisionDetector());
+    public void removeLevelObject(GameObject obj) {
+        if (obj instanceof PhysicsObject) {
+            PhysicsObject objPO = (PhysicsObject) obj;
+            addToWireframe(obj);
+            if (objPO.getCollider() != null) {
+                collisions.remove(objPO.getCollider());
+                removeFromWireframe(objPO.getCollider());
+            }
+            if (objPO.getObjCollisionDetector() != null) {
+                collisions.remove(objPO.getObjCollisionDetector());
+                removeFromWireframe(objPO.getObjCollisionDetector());
+            }
+            if (objPO.getGroundChecker() != null) removeFromWireframe(objPO.getGroundChecker());
+        }
+        if (obj instanceof Updatable) {
+            Updatable objUp = (Updatable) obj;
+            removeFromUpdateThread(thread1, objUp);
+        }
     }
 
     public void addToUpdateThread(UpdateThread thread, Updatable obj) {
@@ -65,6 +85,10 @@ public class Level {
         cam.getWireframeLayer().add(shape);
     }
 
+    public void removeFromWireframe(Shape shape) {
+        cam.getWireframeLayer().remove(shape);
+    }
+
     public void removeFromRender(DrawingLayer layer, Shape shape) {
         layer.remove(shape);
     }
@@ -72,6 +96,7 @@ public class Level {
     public void startPlayer(Player player) {
         this.player = player;
         thread1.add(player);
+        cam.setFocus(player);
 
         addToWireframe(player);
         addToWireframe(player.getGroundChecker());
@@ -83,5 +108,9 @@ public class Level {
 
     public Area getSceneCollision() {
         return sceneCollision;
+    }
+
+    public Camera getCam() {
+        return cam;
     }
 }

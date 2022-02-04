@@ -12,6 +12,9 @@ public class DrawingLayer implements RenderLayer {
 
     private boolean active = true;
 
+    private int xOffset;
+    private int yOffset;
+
     @Override
     public void draw(Graphics2D g, int width, int height) {
         if (!toAdd.isEmpty() || !toRemove.isEmpty())
@@ -19,8 +22,23 @@ public class DrawingLayer implements RenderLayer {
 
         if (active && !renderPool.isEmpty()) {
             g.setColor(Color.RED);
-            for (Shape object : renderPool)
-                g.draw(object);
+
+            for (Shape shape : renderPool) {
+                if (shape instanceof Polygon) {
+                    Polygon obj = (Polygon) shape;
+                    Polygon objTranslated = new Polygon(obj.xpoints, obj.ypoints, obj.npoints);
+
+                    objTranslated.translate(xOffset, yOffset);
+                    g.draw(objTranslated);
+                }
+                if (shape instanceof Rectangle) {
+                    Rectangle obj = (Rectangle) shape;
+                    Rectangle objTranslated = new Rectangle(obj.x, obj.y, obj.width, obj.height);
+
+                    objTranslated.translate(xOffset, yOffset);
+                    g.draw(objTranslated);
+                }
+            }
         }
     }
 
@@ -45,5 +63,10 @@ public class DrawingLayer implements RenderLayer {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public void setOffset(int x, int y) {
+        xOffset = x;
+        yOffset = y;
     }
 }

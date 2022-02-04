@@ -13,16 +13,16 @@ import org.urssg.retrogine.input.InputManager;
 
 public class GameState {
 
+    private WindowConfiguration window;
     private Display display;
     private final DrawingLayer wireframeLayer = new DrawingLayer();
 
     private Level currentLevel;
     private Player player;
-    private Camera cam = new Camera();
+    private Camera cam;
 
     public GameState() {
         createWindow();
-
 
         currentLevel = new Level(cam);
         wireframeLayer.add(Level1.sceneCollision);
@@ -38,14 +38,15 @@ public class GameState {
 
         currentLevel.setLevelCollision(level.getSceneCollision());
         level.getUpdatables().forEach(updatable -> currentLevel.addToUpdateThread(currentLevel.thread1, updatable));
-        //level.getCollisions().forEach(collider -> currentLevel.addLevelObject(collider));
+        level.getCollisions().forEach(collider -> currentLevel.addLevelObject(collider));
         PhysicsObject ph = new PhysicsObject(30, 50, 10, 10, 0, currentLevel);
         ph.setCollider(new Collider(ph));
         currentLevel.addLevelObject(ph);
     }
 
     private void createWindow() {
-        WindowConfiguration window = WindowConfiguration.defaultConfig();
+        window = WindowConfiguration.defaultConfig();
+        cam = new Camera(window.getInternalSize().width / 2, window.getInternalSize().height / 2);
         window.addRenderLayer(cam.getWireframeLayer());
         window.setSize(910, 600);
         window.setTitle("Game");
